@@ -8,9 +8,12 @@ interface Todo {
   completed: boolean;
 }
 
+type Theme = 'warm' | 'cool';
+
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [inputText, setInputText] = useState('');
+  const [theme, setTheme] = useState<Theme>('warm');
 
   const addTodo = () => {
     if (inputText.trim() !== '') {
@@ -40,21 +43,67 @@ export default function TodoList() {
     }
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === 'warm' ? 'cool' : 'warm');
+  };
+
+  // Theme configurations
+  const themeConfig = {
+    warm: {
+      background: 'bg-gradient-to-br from-red-600 via-red-500 to-orange-500',
+      card: 'bg-white/90 backdrop-blur-sm border-red-200/30 shadow-red-200/30',
+      button: 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-orange-500/25',
+      accent: 'text-red-600',
+      focus: 'focus:ring-red-500/20 focus:border-red-400',
+      checkbox: 'text-red-500 focus:ring-red-500/20',
+      stats: {
+        done: 'text-orange-600',
+        left: 'text-red-600'
+      }
+    },
+    cool: {
+      background: 'bg-gradient-to-br from-red-600 via-red-500 to-blue-600',
+      card: 'bg-white/90 backdrop-blur-sm border-blue-200/30 shadow-blue-200/30',
+      button: 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-blue-500/25',
+      accent: 'text-blue-600',
+      focus: 'focus:ring-blue-500/20 focus:border-blue-400',
+      checkbox: 'text-blue-500 focus:ring-blue-500/20',
+      stats: {
+        done: 'text-cyan-600',
+        left: 'text-blue-600'
+      }
+    }
+  };
+
+  const currentTheme = themeConfig[theme];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
+    <div className={`min-h-screen ${currentTheme.background} py-12 px-4`}>
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-light text-slate-800 mb-2">
-            Tasks
-          </h1>
-          <p className="text-slate-500 text-sm">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="text-3xl font-light text-white mb-2">
+              Tasks
+            </h1>
+            <button
+              onClick={toggleTheme}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                theme === 'warm' 
+                  ? 'bg-orange-500/20 text-orange-100 hover:bg-orange-500/30' 
+                  : 'bg-blue-500/20 text-blue-100 hover:bg-blue-500/30'
+              }`}
+            >
+              {theme === 'warm' ? '🔥 Warm' : '❄️ Cool'}
+            </button>
+          </div>
+          <p className="text-white/80 text-sm">
             Stay organized, stay productive
           </p>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-slate-200/50 border border-white/20 overflow-hidden">
+        <div className={`${currentTheme.card} rounded-2xl shadow-xl border border-white/20 overflow-hidden`}>
           {/* Add new todo */}
           <div className="p-6 border-b border-slate-100">
             <div className="flex gap-3">
@@ -64,11 +113,11 @@ export default function TodoList() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="What needs to be done?"
-                className="flex-1 px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-200 text-slate-700 placeholder-slate-400"
+                className={`flex-1 px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 ${currentTheme.focus} transition-all duration-200 text-slate-700 placeholder-slate-400`}
               />
               <button
                 onClick={addTodo}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 font-medium shadow-lg shadow-blue-500/25"
+                className={`px-6 py-3 ${currentTheme.button} text-white rounded-xl focus:outline-none focus:ring-2 ${currentTheme.focus} transition-all duration-200 font-medium shadow-lg`}
               >
                 Add
               </button>
@@ -100,10 +149,10 @@ export default function TodoList() {
                         type="checkbox"
                         checked={todo.completed}
                         onChange={() => toggleTodo(todo.id)}
-                        className="w-5 h-5 text-blue-500 bg-white border-2 border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 cursor-pointer"
+                        className={`w-5 h-5 ${currentTheme.checkbox} bg-white border-2 border-slate-300 rounded-md focus:ring-2 ${currentTheme.focus} transition-all duration-200 cursor-pointer`}
                       />
                       {todo.completed && (
-                        <svg className="absolute inset-0 w-5 h-5 text-blue-500 pointer-events-none" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className={`absolute inset-0 w-5 h-5 ${currentTheme.checkbox} pointer-events-none`} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       )}
@@ -141,11 +190,11 @@ export default function TodoList() {
                   <div className="text-slate-500">Total</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-green-600">{todos.filter(todo => todo.completed).length}</div>
+                  <div className={`font-semibold ${currentTheme.stats.done}`}>{todos.filter(todo => todo.completed).length}</div>
                   <div className="text-slate-500">Done</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-blue-600">{todos.filter(todo => !todo.completed).length}</div>
+                  <div className={`font-semibold ${currentTheme.stats.left}`}>{todos.filter(todo => !todo.completed).length}</div>
                   <div className="text-slate-500">Left</div>
                 </div>
               </div>
@@ -156,5 +205,14 @@ export default function TodoList() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
 
 
